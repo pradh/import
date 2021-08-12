@@ -1,11 +1,13 @@
 package org.datacommons.util;
 
 import com.google.common.base.Charsets;
+import org.datacommons.proto.Debug;
+import org.datacommons.proto.Mcf;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.datacommons.proto.Debug;
-import org.datacommons.proto.Mcf;
 
 // Checks common types of nodes on naming and schema requirements.
 // TODO: Pass in a separate SV nodes so we can validate SVObs better.
@@ -22,10 +24,17 @@ public class McfChecker {
       Set.of(Vocabulary.NAME, Vocabulary.LABEL, Vocabulary.DCID, Vocabulary.SUB_PROPERTY_OF);
   private Mcf.McfGraph graph;
   private LogWrapper logCtx;
+  private HashSet<String> columns;  // Relevant only when graph.type() == TEMPLATE_MCF
   boolean foundFailure = false;
 
   public McfChecker(Mcf.McfGraph graph, LogWrapper logCtx) {
     this.graph = graph;
+    this.logCtx = logCtx;
+  }
+
+  public McfChecker(Mcf.McfGraph graph, HashSet<String> columns, LogWrapper logCtx) {
+    this.graph = graph;
+    this.columns = columns;
     this.logCtx = logCtx;
   }
 
@@ -316,7 +325,30 @@ public class McfChecker {
     }
   }
 
-  private void checkTemplate(String nodeId, Mcf.McfGraph.PropertyValues node) {}
+  private void checkTemplate(String nodeId, Mcf.McfGraph.PropertyValues node) {
+    for (Map.Entry<String, Mcf.McfGraph.Values> pv : node.getPvsMap().entrySet()) {
+      for (Mcf.McfGraph.TypedValue tv : pv.getValue().getTypedValuesList()) {
+        if (tv.getType() == Mcf.ValueType.TABLE_ENTITY) {
+          if (!graph.getNodesMap().containsKey(tv.getValue())) {
+              << "Missing entity " << tv.val() << " in " << kv1.first;
+          }
+        } else if (tv.getType() == Mcf.ValueType.TABLE_COLUMN) {
+          // NOTE: If the MCF had parsed, the schema terms should be valid, thus
+          // the ValueOrDie().
+          McfParser.SchemaTerm term = McfParser.parseSchemaTerm(tv.getValue(), null)
+          if (term.type != McfParser.SchemaTerm.Type.COLUMN) {
+            addLog("Sanity_TemplateColumnParseFailure",
+                    "Failed to parse ");
+          }
+          if (columns != null && !columns.contains(term.value)) {
+            RET_CHECK(gtl::ContainsKey(columns, term.value))
+              << "Missing column " << term.value << " (" << tv.val()
+                    << ") found in " << kv1.first;
+          }
+        }
+      }
+    }
+  }
 
   private String checkRequiredSingleValueProp(
       String nodeId, Mcf.McfGraph.PropertyValues node, String typeOf, String prop) {
