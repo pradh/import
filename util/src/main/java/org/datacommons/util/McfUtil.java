@@ -14,13 +14,12 @@
 
 package org.datacommons.util;
 
-import org.datacommons.proto.Debug;
-import org.datacommons.proto.Mcf;
-
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.regex.Pattern;
+import org.datacommons.proto.Debug;
+import org.datacommons.proto.Mcf;
 
 // A container class of MCF related utilities.
 public class McfUtil {

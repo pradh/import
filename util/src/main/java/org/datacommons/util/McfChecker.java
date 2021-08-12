@@ -1,12 +1,11 @@
 package org.datacommons.util;
 
 import com.google.common.base.Charsets;
-import org.datacommons.proto.Debug;
-import org.datacommons.proto.Mcf;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.datacommons.proto.Debug;
+import org.datacommons.proto.Mcf;
 
 // Checks common types of nodes on naming and schema requirements.
 // TODO: Pass in associated SV nodes to validate SVObs better.
@@ -23,7 +22,7 @@ public class McfChecker {
       Set.of(Vocabulary.NAME, Vocabulary.LABEL, Vocabulary.DCID, Vocabulary.SUB_PROPERTY_OF);
   private Mcf.McfGraph graph;
   private LogWrapper logCtx;
-  private Set<String> columns;  // Relevant only when graph.type() == TEMPLATE_MCF
+  private Set<String> columns; // Relevant only when graph.type() == TEMPLATE_MCF
   boolean foundFailure = false;
 
   public McfChecker(Mcf.McfGraph graph, LogWrapper logCtx) {
@@ -80,10 +79,15 @@ public class McfChecker {
       for (Mcf.McfGraph.TypedValue tv : pv.getValue().getTypedValuesList()) {
         if (tv.getType() == Mcf.ValueType.TABLE_ENTITY) {
           if (!graph.getNodesMap().containsKey(tv.getValue())) {
-            addLog("Sanity_TmcfMissingEntityDef",
-                    "Missing entity '" + tv.getValue() + "' referred to in property "
-                            + pv.getKey() + " of TMCF entity " + nodeId,
-                    node);
+            addLog(
+                "Sanity_TmcfMissingEntityDef",
+                "Missing entity '"
+                    + tv.getValue()
+                    + "' referred to in property "
+                    + pv.getKey()
+                    + " of TMCF entity "
+                    + nodeId,
+                node);
             continue;
           }
         } else if (tv.getType() == Mcf.ValueType.TABLE_COLUMN) {
@@ -91,17 +95,26 @@ public class McfChecker {
           // the ValueOrDie().
           McfParser.SchemaTerm term = McfParser.parseSchemaTerm(tv.getValue(), null);
           if (term.type != McfParser.SchemaTerm.Type.COLUMN) {
-            addLog("Sanity_TmcfUnexpectedNonColumn",
-                    "Unable to parse TMCF column '" + tv.getValue() + "' in property " +
-                            pv.getKey() + " of TMCF entity " + nodeId,
-                    node);
+            addLog(
+                "Sanity_TmcfUnexpectedNonColumn",
+                "Unable to parse TMCF column '"
+                    + tv.getValue()
+                    + "' in property "
+                    + pv.getKey()
+                    + " of TMCF entity "
+                    + nodeId,
+                node);
             continue;
           }
           if (columns != null && !columns.contains(term.value)) {
-            addLog("Sanity_TmcfMissingColumn",
-                    "Column '" + term.value + "' referred in TMCF node " + nodeId +
-                            " is missing from the CSV header",
-                    node);
+            addLog(
+                "Sanity_TmcfMissingColumn",
+                "Column '"
+                    + term.value
+                    + "' referred in TMCF node "
+                    + nodeId
+                    + " is missing from the CSV header",
+                node);
             continue;
           }
         }
@@ -118,15 +131,16 @@ public class McfChecker {
     String mProp =
         checkRequiredSingleValueProp(
             nodeId, node, Vocabulary.STAT_VAR_TYPE, Vocabulary.MEASURED_PROP);
-    checkInitCasing(nodeId, node, Vocabulary.MEASURED_PROP, mProp, "",false);
+    checkInitCasing(nodeId, node, Vocabulary.MEASURED_PROP, mProp, "", false);
 
     String statType =
         checkRequiredSingleValueProp(nodeId, node, Vocabulary.STAT_VAR_TYPE, Vocabulary.STAT_TYPE);
-    if (!Vocabulary.isStatValueProperty(statType) &&
-            !statType.equals(Vocabulary.MEASUREMENT_RESULT)) {
-      addLog("Sanity_UnknownStatType",
-              "Found an unknown statType value '" + statType + "' in node " + nodeId,
-              node);
+    if (!Vocabulary.isStatValueProperty(statType)
+        && !statType.equals(Vocabulary.MEASUREMENT_RESULT)) {
+      addLog(
+          "Sanity_UnknownStatType",
+          "Found an unknown statType value '" + statType + "' in node " + nodeId,
+          node);
     }
   }
 
@@ -168,7 +182,7 @@ public class McfChecker {
     String mProp =
         checkRequiredSingleValueProp(
             nodeId, node, Vocabulary.LEGACY_OBSERVATION_TYPE_SUFFIX, Vocabulary.MEASURED_PROP);
-    checkInitCasing(nodeId, node, Vocabulary.MEASURED_PROP, mProp,"",false);
+    checkInitCasing(nodeId, node, Vocabulary.MEASURED_PROP, mProp, "", false);
 
     checkRequiredSingleValueProp(
         nodeId, node, Vocabulary.LEGACY_OBSERVATION_TYPE_SUFFIX, Vocabulary.OBSERVED_NODE);
@@ -214,12 +228,10 @@ public class McfChecker {
     if (!value_present) {
       List<String> vals = McfUtil.getPropVals(node, Vocabulary.MEASUREMENT_RESULT);
       if (vals.isEmpty()) {
-        addLog("Sanity_ObsMissingValueProp",
-                "Missing any value property in node " + nodeId,
-                node);
+        addLog("Sanity_ObsMissingValueProp", "Missing any value property in node " + nodeId, node);
       } else {
         checkRequiredSingleValueProp(
-                nodeId, node, Vocabulary.LEGACY_OBSERVATION_TYPE_SUFFIX, Vocabulary.MEASUREMENT_RESULT);
+            nodeId, node, Vocabulary.LEGACY_OBSERVATION_TYPE_SUFFIX, Vocabulary.MEASUREMENT_RESULT);
       }
     }
   }
@@ -236,11 +248,7 @@ public class McfChecker {
       if (!Character.isLowerCase(prop.charAt(0))) {
         addLog(
             "Sanity_NotInitLowerPropName",
-            "Property name '"
-                + prop
-                + "' does not start with a "
-                + "lower-case in node "
-                + nodeId,
+            "Property name '" + prop + "' does not start with a " + "lower-case in node " + nodeId,
             node);
         continue;
       }

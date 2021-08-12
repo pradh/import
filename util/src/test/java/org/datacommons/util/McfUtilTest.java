@@ -14,18 +14,17 @@
 
 package org.datacommons.util;
 
-import org.apache.commons.io.IOUtils;
-import org.datacommons.proto.Mcf;
-import org.junit.Test;
+import static com.google.common.truth.extensions.proto.ProtoTruth.assertThat;
+import static org.datacommons.util.McfUtil.*;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-
-import static com.google.common.truth.extensions.proto.ProtoTruth.assertThat;
-import static org.datacommons.util.McfUtil.*;
-import static org.junit.Assert.*;
+import org.apache.commons.io.IOUtils;
+import org.datacommons.proto.Mcf;
+import org.junit.Test;
 
 public class McfUtilTest {
   private static String SERIALIZE_INPUT =

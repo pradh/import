@@ -1,13 +1,12 @@
 package org.datacommons.util;
 
 import com.google.protobuf.TextFormat;
-import org.datacommons.proto.Debug;
-import org.datacommons.proto.Mcf;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.Map;
+import org.datacommons.proto.Debug;
+import org.datacommons.proto.Mcf;
 
 // Common set of utils used in unit tests.
 public class TestUtil {
@@ -25,8 +24,7 @@ public class TestUtil {
   }
 
   public static Mcf.McfGraph graphFromMcf(String mcfString) throws IOException {
-    return McfParser.parseInstanceMcfString(mcfString, false,
-            TestUtil.newLogCtx("InMemory"));
+    return McfParser.parseInstanceMcfString(mcfString, false, TestUtil.newLogCtx("InMemory"));
   }
 
   public static String mcfFromFile(String filePath) throws IOException {
@@ -45,8 +43,13 @@ public class TestUtil {
         if (ent.getUserMessage().contains(subMessage)) {
           return true;
         } else {
-          System.err.println("Missing message fragment '" + subMessage + "'. Instead found '" +
-                  ent.getUserMessage() + "' :: " + ent);
+          System.err.println(
+              "Missing message fragment '"
+                  + subMessage
+                  + "'. Instead found '"
+                  + ent.getUserMessage()
+                  + "' :: "
+                  + ent);
           return false;
         }
       }

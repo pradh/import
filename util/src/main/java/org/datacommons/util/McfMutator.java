@@ -1,12 +1,11 @@
 package org.datacommons.util;
 
-import org.datacommons.proto.Debug;
-import org.datacommons.proto.Mcf;
+import static org.datacommons.util.McfUtil.getPropVals;
 
 import java.util.List;
 import java.util.Map;
-
-import static org.datacommons.util.McfUtil.getPropVals;
+import org.datacommons.proto.Debug;
+import org.datacommons.proto.Mcf;
 
 // Does additional transformations on parsed MCF nodes, like expanding ComplexValues into nodes.
 //
@@ -29,8 +28,8 @@ public class McfMutator {
     return graph.build();
   }
 
-  private Mcf.McfGraph.PropertyValues applyOnNode(String nodeId,
-                                                  Mcf.McfGraph.PropertyValues.Builder node) {
+  private Mcf.McfGraph.PropertyValues applyOnNode(
+      String nodeId, Mcf.McfGraph.PropertyValues.Builder node) {
     List<String> types = getPropVals(node.build(), Vocabulary.TYPE_OF);
     if (types == null) {
       logCtx.addEntry(
@@ -68,7 +67,8 @@ public class McfMutator {
           Mcf.McfGraph.PropertyValues.Builder complexNode =
               Mcf.McfGraph.PropertyValues.newBuilder();
           ComplexValueParser cvParser =
-              new ComplexValueParser(nodeId, node.build(), prop, tv.getValue(), complexNode, logCtx);
+              new ComplexValueParser(
+                  nodeId, node.build(), prop, tv.getValue(), complexNode, logCtx);
           if (cvParser.parse()) {
             tvb.setValue(cvParser.getDcid());
             tvb.setType(Mcf.ValueType.RESOLVED_REF);

@@ -1,25 +1,24 @@
 package org.datacommons.util;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public class McfMutatorTest {
   @Test
   public void testComplex() throws IOException {
     String mcf =
-            "Node: dcid:Count_Person_18Years_1000To2000USD\n" +
-                    "typeOf: schema:StatisticalVariable\n" +
-                    "populationType: schema:Person\n" +
-                    "measuredProperty: schema:count\n" +
-                    "statType: dcs:measuredValue\n" +
-                    "age: [dcs:Year 18]\n" +
-                    "income: [dcs:USDollar 1000 2000]\n" +
-                    "bogusProp: [LatLong 37.3884812 -122.0834373]";
-    McfMutator mutator = new McfMutator(TestUtil.graphFromMcf(mcf).toBuilder(),
-            TestUtil.newLogCtx("InMemory"));
+        "Node: dcid:Count_Person_18Years_1000To2000USD\n"
+            + "typeOf: schema:StatisticalVariable\n"
+            + "populationType: schema:Person\n"
+            + "measuredProperty: schema:count\n"
+            + "statType: dcs:measuredValue\n"
+            + "age: [dcs:Year 18]\n"
+            + "income: [dcs:USDollar 1000 2000]\n"
+            + "bogusProp: [LatLong 37.3884812 -122.0834373]";
+    McfMutator mutator =
+        new McfMutator(TestUtil.graphFromMcf(mcf).toBuilder(), TestUtil.newLogCtx("InMemory"));
 
     String want =
         "Node: USDollar1000To2000\n"
@@ -58,14 +57,16 @@ public class McfMutatorTest {
 
   @Test
   public void testLegacyObsValue() throws IOException {
-    String mcf = "Node: LegacyObs\n" +
-            "typeOf: schema:Observation\n" +
-            "observedNode: dcid:country/USA\n" +
-            "measuredValue: \"1000,0000.0%\"\n" +
-            "observationDate: \"2009\"\n";
+    String mcf =
+        "Node: LegacyObs\n"
+            + "typeOf: schema:Observation\n"
+            + "observedNode: dcid:country/USA\n"
+            + "measuredValue: \"1000,0000.0%\"\n"
+            + "observationDate: \"2009\"\n";
     McfMutator mutator =
-            new McfMutator(TestUtil.graphFromMcf(mcf).toBuilder(), TestUtil.newLogCtx("InMemory"));
-    String want = "Node: LegacyObs\n"
+        new McfMutator(TestUtil.graphFromMcf(mcf).toBuilder(), TestUtil.newLogCtx("InMemory"));
+    String want =
+        "Node: LegacyObs\n"
             + "measuredValue: \"10000000.0\"\n"
             + "observationDate: 2009\n"
             + "observedNode: dcid:country/USA\n"
@@ -76,16 +77,16 @@ public class McfMutatorTest {
 
   @Test
   public void testSVObsValue() throws IOException {
-    String mcf = "Node: SVObs\n" +
-            "observationAbout: dcid:country/USA\n" +
-            "observationDate: 2009\n" +
-            "typeOf: dcid:StatVarObservation\n" +
-            "value: \"10000000.0%\"\n" +
-            "variableMeasured: dcid:Count_Male_18Years_1000To2000USD\n" +
-            "\n";
+    String mcf =
+        "Node: SVObs\n"
+            + "observationAbout: dcid:country/USA\n"
+            + "observationDate: 2009\n"
+            + "typeOf: dcid:StatVarObservation\n"
+            + "value: \"10000000.0%\"\n"
+            + "variableMeasured: dcid:Count_Male_18Years_1000To2000USD\n"
+            + "\n";
     McfMutator mutator =
-            new McfMutator(TestUtil.graphFromMcf(mcf).toBuilder(),
-                    TestUtil.newLogCtx("InMemory"));
+        new McfMutator(TestUtil.graphFromMcf(mcf).toBuilder(), TestUtil.newLogCtx("InMemory"));
     assertEquals(McfUtil.serializeMcfGraph(mutator.apply(), true), mcf);
   }
 }

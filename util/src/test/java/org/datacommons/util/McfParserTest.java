@@ -14,20 +14,19 @@
 
 package org.datacommons.util;
 
-import org.apache.commons.io.IOUtils;
-import org.datacommons.proto.Mcf.McfGraph;
-import org.datacommons.proto.Mcf.McfType;
-import org.junit.Test;
+import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.extensions.proto.ProtoTruth.assertThat;
+import static org.datacommons.util.McfParser.SplitAndStripArg;
+import static org.datacommons.util.McfParser.splitAndStripWithQuoteEscape;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-
-import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.extensions.proto.ProtoTruth.assertThat;
-import static org.datacommons.util.McfParser.SplitAndStripArg;
-import static org.datacommons.util.McfParser.splitAndStripWithQuoteEscape;
+import org.apache.commons.io.IOUtils;
+import org.datacommons.proto.Mcf.McfGraph;
+import org.datacommons.proto.Mcf.McfType;
+import org.junit.Test;
 
 public class McfParserTest {
   @Test
