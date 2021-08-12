@@ -149,8 +149,6 @@ public class McfChecker {
         nodeId, node, Vocabulary.STAT_VAR_OBSERVATION_TYPE, Vocabulary.VARIABLE_MEASURED);
     checkRequiredSingleValueProp(
         nodeId, node, Vocabulary.STAT_VAR_OBSERVATION_TYPE, Vocabulary.OBSERVATION_ABOUT);
-    checkRequiredSingleValueProp(
-        nodeId, node, Vocabulary.STAT_VAR_OBSERVATION_TYPE, Vocabulary.GENERIC_VALUE);
     String obsDate =
         checkRequiredSingleValueProp(
             nodeId, node, Vocabulary.STAT_VAR_OBSERVATION_TYPE, Vocabulary.OBSERVATION_DATE);
@@ -167,6 +165,12 @@ public class McfChecker {
               + nodeId,
           node);
     }
+    checkRequiredSingleValueProp(
+        Debug.Log.Level.LEVEL_WARNING,
+        nodeId,
+        node,
+        Vocabulary.STAT_VAR_OBSERVATION_TYPE,
+        Vocabulary.GENERIC_VALUE);
   }
 
   private void checkLegacyPopulation(String nodeId, Mcf.McfGraph.PropertyValues node) {
@@ -228,7 +232,11 @@ public class McfChecker {
     if (!value_present) {
       List<String> vals = McfUtil.getPropVals(node, Vocabulary.MEASUREMENT_RESULT);
       if (vals.isEmpty()) {
-        addLog("Sanity_ObsMissingValueProp", "Missing any value property in node " + nodeId, node);
+        addLog(
+            Debug.Log.Level.LEVEL_WARNING,
+            "Sanity_ObsMissingValueProp",
+            "Missing any value " + "property in node " + nodeId,
+            node);
       } else {
         checkRequiredSingleValueProp(
             nodeId, node, Vocabulary.LEGACY_OBSERVATION_TYPE_SUFFIX, Vocabulary.MEASUREMENT_RESULT);
@@ -380,9 +388,19 @@ public class McfChecker {
 
   private String checkRequiredSingleValueProp(
       String nodeId, Mcf.McfGraph.PropertyValues node, String typeOf, String prop) {
+    return checkRequiredSingleValueProp(Debug.Log.Level.LEVEL_ERROR, nodeId, node, typeOf, prop);
+  }
+
+  private String checkRequiredSingleValueProp(
+      Debug.Log.Level level,
+      String nodeId,
+      Mcf.McfGraph.PropertyValues node,
+      String typeOf,
+      String prop) {
     List<String> vals = McfUtil.getPropVals(node, prop);
     if (vals.isEmpty()) {
       addLog(
+          level,
           "Sanity_MissingOrEmpty_" + prop,
           "Missing or empty value for property "
               + prop
@@ -395,6 +413,7 @@ public class McfChecker {
     }
     if (vals.size() != 1) {
       addLog(
+          level,
           "Sanity_MultipleVals_" + prop,
           "Found multiple values for " + prop + " in node " + nodeId,
           node);
@@ -454,7 +473,12 @@ public class McfChecker {
   }
 
   private void addLog(String counter, String message, Mcf.McfGraph.PropertyValues node) {
+    addLog(Debug.Log.Level.LEVEL_ERROR, counter, message, node);
+  }
+
+  private void addLog(
+      Debug.Log.Level level, String counter, String message, Mcf.McfGraph.PropertyValues node) {
     foundFailure = true;
-    logCtx.addEntry(Debug.Log.Level.LEVEL_ERROR, counter, message, node.getLocationsList());
+    logCtx.addEntry(level, counter, message, node.getLocationsList());
   }
 }
