@@ -14,6 +14,12 @@
 
 package org.datacommons.util;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.datacommons.proto.Debug;
+import org.datacommons.proto.Mcf;
+
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -21,11 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.datacommons.proto.Debug;
-import org.datacommons.proto.Mcf;
 
 // Converts a Template MCF file and an associated CSV into instance MCF.
 public class TmcfCsvParser {
@@ -251,7 +252,7 @@ public class TmcfCsvParser {
           if (term.type != McfParser.SchemaTerm.Type.COLUMN) {
             addLog(
                 Debug.Log.Level.LEVEL_ERROR,
-                "CSV_UnexpectedNonColumn",
+                "CSV_TmcfUnexpectedNonColumn",
                 "Unable to parse TMCF column "
                     + typedValue.getValue()
                     + " in property "
@@ -264,7 +265,7 @@ public class TmcfCsvParser {
           if (!cleanedColumnMap.containsKey(column)) {
             addLog(
                 Debug.Log.Level.LEVEL_ERROR,
-                "CSV_MissingTmcfColumn",
+                "CSV_TmcfMissingColumn",
                 "Column " + column + " referred in TMCF is missing from CSV header");
             continue;
           }

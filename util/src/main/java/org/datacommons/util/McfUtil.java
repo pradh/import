@@ -14,12 +14,13 @@
 
 package org.datacommons.util;
 
+import org.datacommons.proto.Debug;
+import org.datacommons.proto.Mcf;
+
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.regex.Pattern;
-import org.datacommons.proto.Debug;
-import org.datacommons.proto.Mcf;
 
 // A container class of MCF related utilities.
 public class McfUtil {
@@ -57,7 +58,7 @@ public class McfUtil {
   }
 
   public static String getPropVal(Mcf.McfGraph.PropertyValues node, String property) {
-    String val = null;
+    String val = "";
     try {
       Mcf.McfGraph.Values vals = node.getPvsOrThrow(property);
       if (vals.getTypedValuesCount() > 0) {
@@ -70,11 +71,10 @@ public class McfUtil {
   }
 
   public static List<String> getPropVals(Mcf.McfGraph.PropertyValues node, String property) {
-    List<String> result = null;
+    List<String> result = new ArrayList<>();
     try {
       Mcf.McfGraph.Values vals = node.getPvsOrThrow(property);
       if (vals.getTypedValuesCount() > 0) {
-        result = new ArrayList<>();
         for (Mcf.McfGraph.TypedValue tv : vals.getTypedValuesList()) {
           result.add(stripNamespace(tv.getValue()));
         }

@@ -1,12 +1,13 @@
 package org.datacommons.util;
 
 import com.google.protobuf.TextFormat;
+import org.datacommons.proto.Debug;
+import org.datacommons.proto.Mcf;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.Map;
-import org.datacommons.proto.Debug;
-import org.datacommons.proto.Mcf;
 
 // Common set of utils used in unit tests.
 public class TestUtil {
@@ -27,6 +28,26 @@ public class TestUtil {
     Mcf.McfGraph graph =
         McfParser.parseInstanceMcfFile(filePath, false, TestUtil.newLogCtx(filePath));
     return McfUtil.serializeMcfGraph(graph, true);
+  }
+
+  public static boolean checkLog(Debug.Log log, String counter, String subMessage) {
+    if (!log.getCounterSet().getCountersMap().containsKey(counter)) {
+      System.err.println("Missing counter " + counter + " stat :: " + log.getCounterSet());
+      return false;
+    }
+    for (Debug.Log.Entry ent : log.getEntriesList()) {
+      if (ent.getCounterKey().equals(counter)) {
+        if (ent.getUserMessage().contains(subMessage)) {
+          return true;
+        } else {
+          System.err.println("Missing message fragment '" + subMessage + "'. Instead found '" +
+                  ent.getUserMessage() + "' :: " + ent);
+          return false;
+        }
+      }
+    }
+    System.err.println("Missing counter " + counter + " in entries :: " + log.getCounterSet());
+    return false;
   }
 
   public static Mcf.McfGraph getLocations(Mcf.McfGraph graph) {
