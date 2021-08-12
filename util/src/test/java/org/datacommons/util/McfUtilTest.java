@@ -14,17 +14,18 @@
 
 package org.datacommons.util;
 
-import static com.google.common.truth.extensions.proto.ProtoTruth.assertThat;
-import static org.datacommons.util.McfUtil.*;
-import static org.junit.Assert.*;
+import org.apache.commons.io.IOUtils;
+import org.datacommons.proto.Mcf;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.io.IOUtils;
-import org.datacommons.proto.Mcf;
-import org.junit.Test;
+
+import static com.google.common.truth.extensions.proto.ProtoTruth.assertThat;
+import static org.datacommons.util.McfUtil.*;
+import static org.junit.Assert.*;
 
 public class McfUtilTest {
   private static String SERIALIZE_INPUT =
@@ -124,7 +125,7 @@ public class McfUtilTest {
 
     // Match locations.
     Mcf.McfGraph expLoc =
-        TestUtil.graph(
+        TestUtil.graphFromProto(
             IOUtils.toString(
                 this.getClass().getResourceAsStream("McfUtilTest_MergedLocations.textproto"),
                 StandardCharsets.UTF_8));

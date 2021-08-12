@@ -14,19 +14,20 @@
 
 package org.datacommons.util;
 
-import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.extensions.proto.ProtoTruth.assertThat;
-import static org.datacommons.util.McfParser.SplitAndStripArg;
-import static org.datacommons.util.McfParser.splitAndStripWithQuoteEscape;
+import org.apache.commons.io.IOUtils;
+import org.datacommons.proto.Mcf.McfGraph;
+import org.datacommons.proto.Mcf.McfType;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import org.apache.commons.io.IOUtils;
-import org.datacommons.proto.Mcf.McfGraph;
-import org.datacommons.proto.Mcf.McfType;
-import org.junit.Test;
+
+import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.extensions.proto.ProtoTruth.assertThat;
+import static org.datacommons.util.McfParser.SplitAndStripArg;
+import static org.datacommons.util.McfParser.splitAndStripWithQuoteEscape;
 
 public class McfParserTest {
   @Test
@@ -142,7 +143,7 @@ public class McfParserTest {
   }
 
   private McfGraph expected(String protoFile) throws IOException {
-    return TestUtil.graph(
+    return TestUtil.graphFromProto(
         IOUtils.toString(this.getClass().getResourceAsStream(protoFile), StandardCharsets.UTF_8));
   }
 }

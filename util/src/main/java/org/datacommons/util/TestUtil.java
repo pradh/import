@@ -18,13 +18,18 @@ public class TestUtil {
     return logCtx;
   }
 
-  public static Mcf.McfGraph graph(String protoString) throws IOException {
+  public static Mcf.McfGraph graphFromProto(String protoString) throws IOException {
     Mcf.McfGraph.Builder expected = Mcf.McfGraph.newBuilder();
     TextFormat.getParser().merge(new StringReader(protoString), expected);
     return expected.build();
   }
 
-  public static String mcf(String filePath) throws IOException {
+  public static Mcf.McfGraph graphFromMcf(String mcfString) throws IOException {
+    return McfParser.parseInstanceMcfString(mcfString, false,
+            TestUtil.newLogCtx("InMemory"));
+  }
+
+  public static String mcfFromFile(String filePath) throws IOException {
     Mcf.McfGraph graph =
         McfParser.parseInstanceMcfFile(filePath, false, TestUtil.newLogCtx(filePath));
     return McfUtil.serializeMcfGraph(graph, true);

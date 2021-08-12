@@ -1,40 +1,44 @@
 package org.datacommons.util;
 
-import static org.datacommons.util.McfUtil.getPropVals;
-
-import java.util.List;
-import java.util.Map;
 import org.datacommons.proto.Debug;
 import org.datacommons.proto.Mcf;
 
+import java.util.List;
+import java.util.Map;
+
+import static org.datacommons.util.McfUtil.getPropVals;
+
 // Does additional transformations on parsed MCF nodes, like expanding ComplexValues into nodes.
-// TODO: Pass in a separate SV nodes so we can validate SVObs better.
+//
+// TODO: Implement constraintProperties computation for SV (CPP Partiy).
+// TODO: Attach provenance maybe (CPP Partiy).
+// TODO: Pass in a separate SV nodes to clean SVObs double values.
 public class McfMutator {
-  private Mcf.McfGraph graph;
+  private Mcf.McfGraph.Builder graph;
   private LogWrapper logCtx;
 
-  public McfMutator(Mcf.McfGraph graph, LogWrapper logCtx) {
+  public McfMutator(Mcf.McfGraph.Builder graph, LogWrapper logCtx) {
     this.graph = graph;
     this.logCtx = logCtx;
   }
 
-  public void apply() {
+  public Mcf.McfGraph apply() {
     for (String nodeId : graph.getNodesMap().keySet()) {
-      Mcf.McfGraph.PropertyValues node = graph.toBuilder().getNodesOrThrow(nodeId);
-      applyOnNode(nodeId, node);
-      graph.toBuilder().putNodes(nodeId, node);
+      graph.putNodes(nodeId, applyOnNode(nodeId, graph.getNodesOrThrow(nodeId).toBuilder()));
     }
+    return graph.build();
   }
 
-  private void applyOnNode(String nodeId, Mcf.McfGraph.PropertyValues node) {
-    List<String> types = getPropVals(node, Vocabulary.TYPE_OF);
+  private Mcf.McfGraph.PropertyValues applyOnNode(String nodeId,
+                                                  Mcf.McfGraph.PropertyValues.Builder node) {
+    List<String> types = getPropVals(node.build(), Vocabulary.TYPE_OF);
     if (types == null) {
       logCtx.addEntry(
           Debug.Log.Level.LEVEL_ERROR,
-          "Schema_MissingTypeOf",
+          "Mutator_MissingTypeOf",
           "Missing typeOf value for node " + nodeId,
           node.getLocationsList());
-      return;
+      return node.build();
     }
     boolean isLegacyObs = false;
     for (String type : types) {
@@ -45,32 +49,37 @@ public class McfMutator {
     }
     for (Map.Entry<String, Mcf.McfGraph.Values> pv : node.getPvsMap().entrySet()) {
       String prop = pv.getKey();
+      Mcf.McfGraph.Values.Builder vb = Mcf.McfGraph.Values.newBuilder();
       for (Mcf.McfGraph.TypedValue tv : pv.getValue().getTypedValuesList()) {
+        Mcf.McfGraph.TypedValue.Builder tvb = tv.toBuilder();
         if (isLegacyObs && Vocabulary.isStatValueProperty(prop)) {
           if (tv.getType() != Mcf.ValueType.NUMBER && tv.getType() != Mcf.ValueType.TEXT) {
             logCtx.addEntry(
                 Debug.Log.Level.LEVEL_ERROR,
-                "Schema_InvalidObsValue",
+                "Mutator_InvalidObsValue",
                 "Wrong inferred type " + tv.getType() + " for property " + prop + " in " + nodeId,
                 node.getLocationsList());
-            return;
+            return node.build();
           }
-          tv.toBuilder().setValue(prepForDoubleConversion(tv.getValue()));
+          tvb.setValue(prepForDoubleConversion(tv.getValue()));
         }
 
         if (tv.getType() == Mcf.ValueType.COMPLEX_VALUE) {
           Mcf.McfGraph.PropertyValues.Builder complexNode =
               Mcf.McfGraph.PropertyValues.newBuilder();
           ComplexValueParser cvParser =
-              new ComplexValueParser(nodeId, node, prop, tv.getValue(), complexNode, logCtx);
+              new ComplexValueParser(nodeId, node.build(), prop, tv.getValue(), complexNode, logCtx);
           if (cvParser.parse()) {
-            tv.toBuilder().setValue(cvParser.getDcid());
-            tv.toBuilder().setType(Mcf.ValueType.RESOLVED_REF);
-            graph.toBuilder().putNodes(cvParser.getDcid(), complexNode.build());
+            tvb.setValue(cvParser.getDcid());
+            tvb.setType(Mcf.ValueType.RESOLVED_REF);
+            graph.putNodes(cvParser.getDcid(), complexNode.build());
           }
         }
+        vb.addTypedValues(tvb.build());
       }
+      node.putPvs(prop, vb.build());
     }
+    return node.build();
   }
 
   private static String prepForDoubleConversion(String v) {

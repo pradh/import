@@ -14,7 +14,10 @@
 
 package org.datacommons.util;
 
-import static org.junit.Assert.assertEquals;
+import org.datacommons.proto.Debug;
+import org.datacommons.proto.Mcf.McfGraph;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -22,10 +25,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import org.datacommons.proto.Debug;
-import org.datacommons.proto.Mcf.McfGraph;
-import org.junit.Before;
-import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 // TODO: Add test once sanity-check is implemented.
 public class TmcfCsvParserTest {
@@ -38,21 +39,21 @@ public class TmcfCsvParserTest {
 
   @Test
   public void statVarObs() throws IOException, URISyntaxException {
-    String want = TestUtil.mcf(resourceFile("TmcfCsvParser_SVO.mcf"));
+    String want = TestUtil.mcfFromFile(resourceFile("TmcfCsvParser_SVO.mcf"));
     String got = run("TmcfCsvParser_SVO.tmcf", "TmcfCsvParser_SVO.csv");
     assertEquals(want, got);
   }
 
   @Test
   public void popObs() throws IOException, URISyntaxException {
-    String want = TestUtil.mcf(resourceFile("TmcfCsvParser_PopObs.mcf"));
+    String want = TestUtil.mcfFromFile(resourceFile("TmcfCsvParser_PopObs.mcf"));
     String got = run("TmcfCsvParser_PopObs.tmcf", "TmcfCsvParser_PopObs.csv");
     assertEquals(want, got);
   }
 
   @Test
   public void multiValue() throws IOException, URISyntaxException {
-    String want = TestUtil.mcf(resourceFile("TmcfCsvParser_MultiValue.mcf"));
+    String want = TestUtil.mcfFromFile(resourceFile("TmcfCsvParser_MultiValue.mcf"));
     String got = run("TmcfCsvParser_MultiValue.tmcf", "TmcfCsvParser_MultiValue.csv");
     assertEquals(want, got);
   }

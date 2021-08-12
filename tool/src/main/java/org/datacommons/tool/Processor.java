@@ -35,8 +35,8 @@ public class Processor {
     McfParser parser = McfParser.init(type, file.getPath(), false, logCtx);
     Mcf.McfGraph n;
     while ((n = parser.parseNextNode()) != null) {
-      McfMutator mutator = new McfMutator(n, logCtx);
-      mutator.apply();
+      McfMutator mutator = new McfMutator(n.toBuilder(), logCtx);
+      n = mutator.apply();
 
       McfChecker checker = new McfChecker(n, logCtx);
       checker.check();
@@ -62,8 +62,8 @@ public class Processor {
       Mcf.McfGraph g;
       long numNodesProcessed = 0, numRowsProcessed = 0;
       while ((g = parser.parseNextRow()) != null) {
-        McfMutator mutator = new McfMutator(g, logCtx);
-        mutator.apply();
+        McfMutator mutator = new McfMutator(g.toBuilder(), logCtx);
+        g = mutator.apply();
 
         McfChecker checker = new McfChecker(g, logCtx);
         checker.check();
